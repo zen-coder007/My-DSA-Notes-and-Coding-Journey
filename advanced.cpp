@@ -269,5 +269,190 @@ class solution{
      |        |          |       |         |       |
    Store    Store      Store   Store     Store   Store
 
-// 
 
+// hard example sudoku 
+
+
+class Solution {
+public:
+    bool isValid(vector<vector<char>>& board, int row, int col, char c) {
+
+        for (int i = 0; i < 9; i++) {
+
+            // Row Check
+            if (board[row][i] == c)
+                return false;
+
+            // Column Check
+            if (board[i][col] == c)
+                return false;
+
+            // 3 x 3 Box Check
+            if (board[3 * (row / 3) + i / 3][3 * (col / 3) + i % 3] == c)
+                return false;
+        }
+
+        return true;
+    }
+
+    bool solve(vector<vector<char>>& board) {
+
+        // Traverse the complete board
+        for (int i = 0; i < 9; i++) {
+
+            for (int j = 0; j < 9; j++) {
+
+                // Empty cell found
+                if (board[i][j] == '.') {
+
+                    // Try digits 1 to 9
+                    for (char c = '1'; c <= '9'; c++) {
+
+                        if (isValid(board, i, j, c)) {
+
+                            // Place the digit
+                            board[i][j] = c;
+
+                            // Solve remaining board
+                            if (solve(board))
+                                return true;
+
+                            // Backtrack
+                            board[i][j] = '.';
+                        }
+                    }
+
+                    // No digit worked
+                    return false;
+                }
+            }
+        }
+
+        // No empty cell left
+        return true;
+    }
+
+    void solveSudoku(vector<vector<char>>& board) {
+        solve(board);
+    }
+};
+
+// another example of n queen problem using recursion
+
+class Solution{
+     void solve( int col,vector<string> &board,vector<vector<string>> &ans,vector<int> &leftrow,vector<int> &upper , vector<int> &lower,int n){
+         if( col == n){
+             ans.push_back(board);
+             return;
+         }
+         for(int row = 0;row<n;row++){
+             if( leftrow[row] == 0 &&  lower[row+col] == 0 && upper[n-1+col-row] == 0 ){
+                 
+                 // check if the queen can be placed in the current row and column or not if it is not placed in the same row or diagonal then we can place the queen in the current row and column
+
+                 board[row][col] = 'Q';
+                 leftrow[row] = 1;
+                 lower[row+col] = 1;
+                 upper[n-1+col-row] = 1;
+                 
+                 solve(col+1,board,ans,leftrow,upper,lower,n); // function call for next column
+
+                 // backtracking
+
+                 board[row][col] = '.';
+                  leftrow[row] = 0;
+                 lower[row+col] = 0;
+                 upper[n-1+col-row] = 0;
+                 
+                 
+             }
+         }
+     }
+     public:
+          vector<vector<string>>solveNQueens(int n){ // function to solve n queen problem
+              vector<vector<string>> ans;
+              vector<string> board(n);
+              string s ( n,'.');
+              for(int i = 0;i<n;i++){
+                  board[i] = s;
+              } 
+              
+          vector<int> leftrow(n,0),upper(2*n-1,0),lower(2*n-1,0); // to check if the queen is placed in the same row or diagonal or not
+          
+          solve(0,board,ans,leftrow,upper,lower,n); // function passed to solve the n queen problem
+          return ans;
+     }
+          
+};
+
+// time complexity of this recursion is O(n!) because it will call the function n times for each function call. space complexity is O(n^2) because it will use stack memory for each function call. space complexity can be reduced to O(n) if we use iteration instead of recursion.
+
+// another example m coloring problem using recursion
+
+
+class Solution{
+
+    // Check karta hai ki current node ko 'col' color dena safe hai ya nahi
+    bool isSafe(int node, int color[], bool graph[101][101], int n, int col){
+
+        // Sabhi nodes ko check karo
+        for(int k = 0; k < n; k++){
+
+            // Agar k current node nahi hai,
+            // aur k aur node ke beech edge hai,
+            // aur k ka color bhi same hai,
+            // to color assign nahi kar sakte.
+            if(k != node && graph[k][node] && color[k] == col){
+                return false;
+            }
+        }
+
+        // Kisi neighbour ka same color nahi mila
+        return true;
+    }
+
+    // Recursive function jo har node ko color assign karta hai
+    bool solve(int node, int color[], int m, int N, bool graph[101][101]){
+
+        // Base Case:
+        // Agar saare nodes color ho gaye
+        if(node == N){
+            return true;
+        }
+
+        // Current node ke liye 1 se m tak har color try karo
+        for(int col = 1; col <= m; col++){
+
+            // Agar ye color safe hai
+            if(isSafe(node, color, graph, N, col)){
+
+                // Color assign kar do
+                color[node] = col;
+
+                // Next node ko color karne ki koshish karo
+                if(solve(node + 1, color, m, N, graph)){
+                    return true;
+                }
+
+                // Backtracking:
+                // Agar aage solution nahi mila,
+                // to current color hata do
+                color[node] = 0;
+            }
+        }
+
+        // Koi bhi color kaam nahi kiya
+        return false;
+    }
+
+public:
+
+    bool graphColoring(bool graph[101][101], int m, int N){
+
+        // Sabhi nodes initially uncolored (0)
+        int color[101] = {0};
+
+        // Node 0 se recursion start
+        return solve(0, color, m, N, graph);
+    }
+};
